@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-from-scratch
+spec:
+  source:
+    helm:
+      releaseName: app_from_helm
+      valueFiles:
+        - custom-values.yaml
+    repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+    path: helm/nginx
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  project: default
+
+
+  # this is for application manifest in argocd, we are using helm chart to deploy nginx application,
+  #  we are using custom values file to override the default values of the helm chart, 
+  #  we are using github repository as source of the helm chart
+  # , we are deploying the application in default namespace of kubernetes cluster, 

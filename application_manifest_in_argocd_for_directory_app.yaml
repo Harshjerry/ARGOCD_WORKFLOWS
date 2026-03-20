@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: directory-app
+spec:
+  source:
+    directory:
+        exclude: 
+          - "serviceaccount.yaml"
+        recurse: true # it will look for manifest files in the subdirectories of the directory_of_manifests too 
+    repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+    path: application-manifest/directory_of_manifests
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: direcotory 
+  project: default
+
+
+## it will deploy all manifest files in the directory_of_manifests directory of the github repository
+
+
+
