@@ -1,16 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-app
+  name: test-app2
   namespace: argocd
 spec:
   project: project1
-
   source:
     repoURL: https://github.com/devjerry04/test_application.git
     targetRevision: main
     path: manifest 
-
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: dev

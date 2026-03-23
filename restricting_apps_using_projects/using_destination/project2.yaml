@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: project1
+  name: project2
   namespace: argocd
 spec:
   sourceRepos:
   - 'https://github.com/devjerry04/test_application.git'  #FROM WHERE your Application is allowed to fetch manifests (Git repos)
   destinations:
-  - namespace: '*'
+  - namespace: 'dev' # if it is target or destination  namespace then  allowed else not
     server: '*'
   clusterResourceWhitelist:
   - group: '*'
