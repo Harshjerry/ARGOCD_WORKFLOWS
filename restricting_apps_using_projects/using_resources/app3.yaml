@@ -1,14 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-app2
-  namespace: argocd  #applicaiton have to be in argocd  ns  to be monitored by argocd ,applicaiton  crd exist in   this ns 
+  name: test-app
+  namespace: argocd
 spec:
   project: project1
+
   source:
     repoURL: https://github.com/devjerry04/test_application.git
     targetRevision: main
     path: manifest 
+
   destination:
     server: https://kubernetes.default.svc
-    namespace: dev  # this is   destination ns  where  your  acutal deployments will be created
+    namespace: default

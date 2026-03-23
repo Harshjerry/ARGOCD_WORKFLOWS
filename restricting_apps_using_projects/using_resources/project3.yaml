@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project3
+  namespace: argocd
+spec:
+  sourceRepos:
+  - '*'  #FROM WHERE your Application is allowed to fetch manifests (Git repos)
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: 'ServiceAccount'  #WHAT KIND of resources your Application is allowed to create in the cluster
+# only service accounts are allowed to be created in this project, 
+#so the application will fail to sync because it tries to create a deployment and a service
+    
