@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project4
+  namespace: argocd
+spec:
+  sourceRepos:
+  - '*'  #FROM WHERE your Application is allowed to fetch manifests (Git repos)
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*' 
+  roles:
+  - name: reader
+    description: can read applications in this project
+    policies:
+    - p, proj:project4:reader, applications, get, */*, allow
+    
+
+    #to create token from this role, you can use below command
+    #argocd proj role create-token -p project4 -r reader
+
+    #now u can use this  token to  run comands wit auth token like below
+    #argocd app list --auth-token <token> 
+    #thi above command will be allowed as  token have reader role 
+    #but
+    #argocd sync app4 --auth-token <token>
+    #this command will be denied as  token have reader role and sync is not allowed for this role
