@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: argocd-template
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds # This label is required for Argo CD to recognize this secret as a repository credential.
+stringData:
+  type: git
+  url: https://github.com/devjerry04  #allowing all repositories under this GitHub account
+  username: argocd-private_repo-token # name of the secret, can be anything
+  password: token_content_from_github # the actual token content from GitHub, can be generated in GitHub settings
