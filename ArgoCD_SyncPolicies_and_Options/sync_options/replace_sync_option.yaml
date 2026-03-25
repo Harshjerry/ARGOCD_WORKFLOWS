@@ -1,0 +1,40 @@
+
+#4 replace sync option
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: automated-sync-app-1
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/devjerry04/test_application.git
+    targetRevision: main
+    path: manifest 
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    syncOptions:
+      - Replace=true  #instead of patching the existing resources, it will delete and recreate the resources to match git state, this is useful when you want to ensure that the resources are recreated with the exact configuration defined in git repo, it will ensure that any manual changes made to the resources in cluster will be overridden and replaced with the configuration defined in git repo.
+    # by default for all resources   
+    automated: 
+      selfHeal: true  #take git as source of truth, if there is any drift between git and cluster, it will automatically sync to match git state.
+      
+
+
+
+
+
+
+
+#further  for specific  resources to replace  instead of all 
+# add  this  annotation to the specific resource in git repo
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
+
+
+
+
+

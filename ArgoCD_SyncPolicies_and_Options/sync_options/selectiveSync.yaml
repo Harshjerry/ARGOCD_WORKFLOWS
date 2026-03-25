@@ -1,0 +1,29 @@
+
+#3selective sync
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: automated-sync-app-1
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/devjerry04/test_application.git
+    targetRevision: main
+    path: manifest 
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+   syncOptions:
+      - ApplyOutOfSyncOnly=true  #only apply changes to objects that are out of sync, if there is any drift between git and cluster, it will only sync those objects which are different in git and cluster rest of the objects will be ignored during sync process.
+  automated: 
+    selfHeal: true  #take git as source of truth, if there is any drift between git and cluster, it will automatically sync to match git state.
+      
+     #only applicable to application with sync policy automated  
+     #whenever changes are deteccted in git repo   for sync  argocd will apply all objects in git repo,
+     #this is  wastaage of time and resources  
+     #if only few objects are changed in git repo(SELECTIVE SYNC) and rest of the objects are same as  in cluster
+
+  
+

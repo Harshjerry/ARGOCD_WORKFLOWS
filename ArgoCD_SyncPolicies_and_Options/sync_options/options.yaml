@@ -1,0 +1,21 @@
+
+#1 for  no prune
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: "Prune=false"
+
+    #add annotations ion   actual deployment and resources to avoid prune
+    #argoccd prevent  that resource from being pruned  even  if automated pruning is enabled   
+    # that resources will  not be deleted during sync and prune  even if it  is  not in git repo 
+
+
+#2 disable kubectl validation
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: "Validate=false"
+
+
+#3  prune last resource 
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: "PruneLast=true"  #when enabled, it will prune the last resource in the sync operation, this is useful when you want to ensure that the last resource is pruned after the sync operation is completed and to avoid any orphaned resources in the cluster.
