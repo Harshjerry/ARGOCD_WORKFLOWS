@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sync-phases-app
+  namespace: argocd  #applicaiton have to be in argocd  ns  to be monitored by argocd ,applicaiton  crd exist in   this ns 
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/devjerry04/test_application.git
+    targetRevision: main
+    path: manifest   ## it will contain prejob and postjob  yaml files and  deployment yaml files
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev  # this is   destination ns  where  your  acutal deployments will be created
+  SyncPolicy:
+    syncOptions:
+    - CreateNamespace=true # this will create the destination ns if it does not exist

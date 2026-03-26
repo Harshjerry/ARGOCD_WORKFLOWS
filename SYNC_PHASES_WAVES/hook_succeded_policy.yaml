@@ -1,0 +1,5 @@
+# 📊 Common Policies
+# Policy	               Meaning
+# HookSucceeded	        Delete after success
+# HookFailed	          Delete after failure
+# BeforeHookCreation	  Delete old hook before creating new one   

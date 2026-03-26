@@ -1,0 +1,19 @@
+ #in service.yaml
+ metadata:
+   name: test-service
+   annotations:
+     argocd.argoproj.io/sync-wave: "2"  
+
+#in deployment.yaml
+ metadata:
+   name: test-deployment
+   annotations:
+     argocd.argoproj.io/sync-wave: "1"
+
+
+
+  #if resources are using same wave and same phase
+  #then they will be applied by Kind
+  #precedence is set by default  checck github of argocd for more details
+  #https://github.com/argoproj/gitops-engine/blob/master/pkg/sync/sync_tasks.go  
+  #then by name of the resource
