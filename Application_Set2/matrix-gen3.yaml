@@ -5,8 +5,7 @@
 # path-2" argocd/helm/nginx/app.yaml
 # we want to deploy  path1 app to  cluster with label env : stage
 
-  
-  
+
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
