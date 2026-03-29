@@ -1,0 +1,45 @@
+# say we have different  paths  of manifest  
+# path-1" argocd/directory/app1.yaml
+# we want to deploy  path1 app to  cluster with label Env: prestage
+
+# path-2" argocd/helm/nginx/app.yaml
+# we want to deploy  path1 app to  cluster with label env : stage
+
+  
+  
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: matrix-generator-ex3
+spec:
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+              revision: main
+              files:
+                - path: v09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json
+           ## config.json file will have cluster name and path of manifest to deploy 
+          ## we match label of cluster in config.json file with label of  cluster in  argocd   
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+                  environment: '{{cluster.name}}' #  this  cluster is parameter from git generator and we match with label of cluster in argocd 
+  template:
+    metadata:
+      name: '{{name}}-application'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+        targetRevision: main
+        path: '{{cluster.path}}'
+      destination:
+        server: '{{server}}'
+        namespace: '{{metadata.labels.environment}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true
