@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: argo-wf-
+
+spec:
+  entrypoint: dag-template
+  agruments:
+    parameters:
+      - name: message
+        value: "hello from global workflow arguments"
+  templates:
+    - name: dag-template
+      dag:
+        tasks:
+          - name: A
+            template: container-template
+            ## passing parameters to a task in DAG
+            # arguments:
+            #   parameters:
+            #     - name: message
+            #       value: "hello from tasks in dag"
+            arguments:
+              parameters:
+                - name: message
+                  value: "{{workflow.parameters.message}}" ##  paramters from glohal workflow arguments
+
+          - name: B
+            template: script-template
+            dependencies: [A]
+
+          - name: C
+            template: resource-template
+            dependencies: [A]
+
+          - name: D
+            template: delay-template
+            dependencies: [B, C]
+
+    # -------------------------------
+    # Container Template
+    # -------------------------------
+    - name: container-template
+      inputs:
+        parameters:
+          - name: message
+      container:
+        image: alpine
+        command: ["/bin/sh", "-c"]
+        args: ["echo {{inputs.parameters.message}}"]
+
+    # -------------------------------
+    # Script Template
+    # -------------------------------
+    - name: script-template
+      script:
+        image: python:alpine3.6
+        command: [python]
+        source: |
+          import random
+          i = random.randint(1, 100)
+          print(i)
+
+    # -------------------------------
+    # Resource Template
+    # -------------------------------
+    - name: resource-template
+      resource:
+        action: create
+        manifest: |
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            generateName: argo-wf-resource-template-cm-
+          data:
+            created_by: argo-workflows
+
+    # -------------------------------
+    # Delay / Suspend Template
+    # -------------------------------
+    - name: delay-template
+      suspend:
+        duration: "20s"

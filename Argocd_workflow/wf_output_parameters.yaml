@@ -1,0 +1,96 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: argo-wf-
+
+spec:
+  entrypoint: dag-template
+  agruments:
+    parameters:
+      - name: message
+        value: "hello from global workflow arguments"
+  templates:
+    - name: dag-template
+      dag:
+        tasks:
+          - name: A
+            template: container-template
+            ## passing parameters to a task in DAG
+            # arguments:
+            #   parameters:
+            #     - name: message
+            #       value: "hello from tasks in dag"
+            arguments:
+              parameters:
+                - name: message
+                  value: "{{workflow.parameters.message}}" ##  paramters from glohal workflow arguments
+
+          - name: B
+            template: script-template
+            dependencies: [A]
+
+          - name: C
+            template: resource-template
+            arguments:
+              parameters:
+                - name: random-input
+                  value: "{{tasks.B.outputs.parameters.random-number}}" ## parameters from script template output
+            dependencies: [A, B]
+
+          - name: D
+            template: delay-template
+            dependencies: [A, B, C]
+
+    # -------------------------------
+    # Container Template
+    # -------------------------------
+    - name: container-template
+      inputs:
+        parameters:
+          - name: message
+      container:
+        image: alpine
+        command: ["/bin/sh", "-c"]
+        args: ["echo {{inputs.parameters.message}}"]
+
+    # -------------------------------
+    # Script Template
+    # -------------------------------
+    - name: script-template
+      outputs:
+        parameters:
+          - name: random-number
+            valueFrom: "/tmp/random_number.txt"
+      script:
+        image: python:alpine3.6
+        command: [python]
+        source: |
+          import random
+          i = random.randint(1, 100)
+          with open("/tmp/random_number.txt", "w") as f:
+              f.write(str(i))
+
+    # -------------------------------
+    # Resource Template
+    # -------------------------------
+    - name: resource-template
+      inputs:
+        parameters:
+          - name: random-input
+      resource:
+        action: create
+        manifest: |
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            generateName: argo-wf-resource-template-cm-
+          data:
+            created_by: argo-workflows
+            random_number: "{{inputs.parameters.random-input}}"
+
+    # -------------------------------
+    # Delay / Suspend Template
+    # -------------------------------
+    - name: delay-template
+      suspend:
+        duration: "20s"
